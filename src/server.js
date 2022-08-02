@@ -1,9 +1,9 @@
 import express  from "express";
 import cors from "cors"
-import dotenv from "dotenv"
-dotenv.config()
+import connection from "./database/postgres.js"
+import router from "./routes/index.js"
 
-
+// console.log('servidor rodou')
 
 
 const server = express()
@@ -11,6 +11,7 @@ server.use(cors())
 server.use(express.json())
 
 
+server.use(router)
 
 
 

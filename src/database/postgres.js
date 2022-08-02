@@ -1,4 +1,9 @@
 import pg from 'pg';
+import dotenv from "dotenv"
+dotenv.config()
+
+// console.log('database rodou')
+
 
 const { Pool } = pg;
 
@@ -16,10 +21,12 @@ const connection = new Pool({
   database
 });
 
-const query = connection.query('SELECT * FROM users');
+// const query = connection.query('SELECT * FROM users');
 
-query.then(result => {
-    console.log(result.rows);
-});
+// query.then(result => {
+//   console.log(result.rows);
+// });
+
+
 
 export default connection;
