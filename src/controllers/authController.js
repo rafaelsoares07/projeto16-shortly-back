@@ -1,9 +1,10 @@
 import connection from "../database/postgres.js";
-
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken";
 
 
 import signupSchema from "../schemas /signupShema.js";
+import signinSchema from "../schemas /signinSchema.js";
 
 
 export async function signupNewUser(req, res){
@@ -38,7 +39,37 @@ export async function signupNewUser(req, res){
     res.status(201).send('novo cadastro feito com sucesso')
 }
 
-
 export async function loginUser(req,res){
+
+        
+    const userLoginValid = signinSchema.validate(userLogin)
+
+    if(userLoginValid.error){
+        res.status(422).send('erro no body')
+        return
+    }
+
+    const {rows:userExist} = await connection.query(
+        `SELECT * FROM users WHERE users.email=$1`,
+        [userLogin.email]
+    )
+
+    console.log(userExist)
+
+    if(userExist.length===0){
+        res.status(401).send('usuario nao existe')
+        return
+    }
+
+    const validPassword = bcrypt.compareSync(userLogin.password,userExist[0].password)
     
+    if(!validPassword){
+        res.status(401).send('usuario existe mas senha nao confere')
+        return
+    }
+
+
+    const token = jwt.sign(userExist[0].id,"secret")
+
+    res.status(200).send({token, userLogin})
 }
