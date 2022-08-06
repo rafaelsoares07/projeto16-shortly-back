@@ -43,3 +43,20 @@ export async function getUrlById(req, res){
 
     res.status(200).send(urlExist)
 }
+
+export async function openUrlShort(req, res){
+    
+    const {shortUrl} = req.params
+
+    const {rows:url} = await connection.query(`SELECT url FROM urls WHERE short_url=$1`,[shortUrl])
+    
+    if(url.length===0){
+        res.status(404).send('nao existe essa shorturl')
+        return
+    }
+
+    const linkOriginal = url[0].url
+    console.log(linkOriginal)
+    
+    res.redirect(linkOriginal)
+}
