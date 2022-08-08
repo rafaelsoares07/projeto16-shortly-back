@@ -41,6 +41,7 @@ export async function signupNewUser(req, res){
 
 export async function loginUser(req,res){
 
+    const userLogin = req.body
         
     const userLoginValid = signinSchema.validate(userLogin)
 
@@ -69,7 +70,7 @@ export async function loginUser(req,res){
     }
 
 
-    const token = jwt.sign(userExist[0].id,"secret")
+    const token = jwt.sign(userExist[0].id, process.env.KEYSECRET)
 
     res.status(200).send({token, userLogin})
 }

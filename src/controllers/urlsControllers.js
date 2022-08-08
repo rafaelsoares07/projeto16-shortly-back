@@ -23,7 +23,7 @@ export async function createUrlShorten(req, res){
         [idUser,body.url,nanoId]
     )
 
-    res.status(200).send('funfou ')
+    res.status(200).send('funfou e criou ')
     return
 }
 
@@ -55,8 +55,59 @@ export async function openUrlShort(req, res){
         return
     }
 
+    await connection.query(`UPDATE urls SET views_cont = views_cont + 1 WHERE short_url=$1`,[shortUrl]) 
+
     const linkOriginal = url[0].url
     console.log(linkOriginal)
-    
+
     res.redirect(linkOriginal)
+}
+
+export async function deleteUrlShort(req, res){
+    const {id} = req.params
+    const idUser = res.locals.idUser
+    const idNum = Number(idUser)
+
+
+    const {rows:urlExist} = await connection.query(`SELECT * FROM urls WHERE id=$1`,[id])
+    
+    if(urlExist.length===0){
+        res.status(404).send('id nao existe')
+        return
+    }
+
+    const idUrl = urlExist[0].user_id
+
+    if(idNum!=idUrl){
+        res.status(401).send('existe mas esse usuario nao foi quem criou')
+        return
+    }
+
+    await connection.query(`DELETE FROM urls WHERE id=$1`,[id])    
+
+    res.status(204).send('url excluida')
+}
+
+export async function getMyUrlsShorten(req, res){
+
+    const idUser = res.locals.idUser
+
+    const {rows:userExist} = await connection.query(`SELECT id,name FROM users WHERE id=$1`,[idUser])
+    const {rows:urlsUser} = await connection.query(`SELECT * FROM urls WHERE user_id=$1`,[idUser])
+    const {rows:visitasTotais} = await  connection.query(`SELECT SUM(views_cont) as "visitCount" FROM urls WHERE user_id=$1`,[idUser])
+    
+    if(userExist.length===0){
+        res.status(404).send('nao tem user')
+        return
+    }
+
+    const infosUser = {
+        id:userExist[0].id,
+        name:userExist[0].name,
+        visitCount:Number(visitasTotais[0].visitCount),
+        shortenedUrls:urlsUser
+    }
+
+
+    res.status(200).send(infosUser)
 }

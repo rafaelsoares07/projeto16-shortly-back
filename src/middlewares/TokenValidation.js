@@ -12,7 +12,7 @@ export default async function tokenValidation(req,res,next){
         return
     }
 
-    const tokenValid = jwt.verify(token, "secret")
+    const tokenValid = jwt.verify(token, process.env.KEYSECRET)
     if(!tokenValid){
         
         res.status(401).send('token invalido')
