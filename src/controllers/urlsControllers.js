@@ -23,7 +23,7 @@ export async function createUrlShorten(req, res){
         [idUser,body.url,nanoId]
     )
 
-    res.status(200).send('funfou e criou ')
+    res.status(200).send({shortUrl:nanoId})
     return
 }
 
